@@ -1,0 +1,22 @@
+{
+    "Group": "pauwma",
+    "Name": "BarrierView",
+    "Version": "1.0.0",
+    "Description": "Toggle wireframe outlines for barrier blocks with /showbarrier",
+    "Authors": [
+        {
+            "Name": "pauwma"
+        }
+    ],
+    "Website": "https://x.com/pauwmaa",
+    "ServerVersion": "*",
+    "Dependencies": {
+        
+    },
+    "OptionalDependencies": {
+        
+    },
+    "DisabledByDefault": false,
+    "Main": "com.pauwma.barrierview.BarrierView",
+    "IncludesAssetPack": false
+}
