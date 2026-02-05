@@ -6,7 +6,7 @@ A Hytale server plugin that renders wireframe outlines around invisible barrier 
 
 - **Per-Player Toggle** - Each player can independently enable or disable barrier visibility
 - **Display Modes** - Choose between Individual block outlines or Grouped connected shapes
-- **Customizable Colors** - 15 preset colors plus full hex color support
+- **Customizable Colors** - 15 preset colors, animated rainbow mode, plus full hex color support
 - **Real-Time Updates** - Automatically detects and displays barriers in your current chunk
 - **Lightweight** - Minimal performance impact with efficient chunk-based scanning
 
@@ -20,7 +20,7 @@ A Hytale server plugin that renders wireframe outlines around invisible barrier 
 
 ### Color Options
 
-**Presets:** `red`, `green`, `blue`, `yellow`, `cyan`, `magenta`, `orange`, `pink`, `purple`, `lime`, `aqua`, `white`, `gray`, `black`, `gold`
+**Presets:** `red`, `green`, `blue`, `yellow`, `cyan`, `magenta`, `orange`, `pink`, `purple`, `lime`, `aqua`, `white`, `gray`, `black`, `gold`, `rainbow`
 
 **Hex Values:** Use standard hex format like `#FF0000`, `#F00`, `FF5500`, etc.
 
@@ -70,6 +70,9 @@ cd BarrierView
 
 # Use a custom hex color
 /barriercolor #00FF88
+
+# Enable animated rainbow mode
+/barriercolor rainbow
 ```
 
 ## Technical Details

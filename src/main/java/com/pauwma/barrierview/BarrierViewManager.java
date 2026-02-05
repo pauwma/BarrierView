@@ -40,6 +40,7 @@ public class BarrierViewManager {
     private static final Map<String, World> activeWorlds = new ConcurrentHashMap<>();
     private static final Map<UUID, DisplayMode> playerDisplayModes = new ConcurrentHashMap<>();
     private static final Map<UUID, Vector3f> playerColors = new ConcurrentHashMap<>();
+    private static final Set<UUID> rainbowPlayers = ConcurrentHashMap.newKeySet();
 
     // Default wireframe color (red for barriers)
     private static final Vector3f DEFAULT_COLOR = new Vector3f(1.0f, 0.0f, 0.0f);
@@ -89,15 +90,73 @@ public class BarrierViewManager {
     }
 
     public static Vector3f getColor(UUID playerUuid) {
+        if (rainbowPlayers.contains(playerUuid)) {
+            return getRainbowColor();
+        }
         return playerColors.getOrDefault(playerUuid, DEFAULT_COLOR);
     }
 
     public static void setColor(UUID playerUuid, Vector3f color) {
+        rainbowPlayers.remove(playerUuid);
         playerColors.put(playerUuid, color);
     }
 
     public static void setColor(UUID playerUuid, ColorPreset preset) {
+        rainbowPlayers.remove(playerUuid);
         playerColors.put(playerUuid, preset.toVector());
+    }
+
+    public static void setRainbowMode(UUID playerUuid, boolean enabled) {
+        if (enabled) {
+            rainbowPlayers.add(playerUuid);
+        } else {
+            rainbowPlayers.remove(playerUuid);
+        }
+    }
+
+    public static boolean isRainbowMode(UUID playerUuid) {
+        return rainbowPlayers.contains(playerUuid);
+    }
+
+    // Rainbow colors array
+    private static final Vector3f[] RAINBOW_COLORS = {
+        new Vector3f(1.0f, 0.0f, 0.0f),   // Red
+        new Vector3f(1.0f, 0.5f, 0.0f),   // Orange
+        new Vector3f(1.0f, 1.0f, 0.0f),   // Yellow
+        new Vector3f(0.0f, 1.0f, 0.0f),   // Green
+        new Vector3f(0.0f, 1.0f, 1.0f),   // Cyan
+        new Vector3f(0.0f, 0.0f, 1.0f),   // Blue
+        new Vector3f(0.5f, 0.0f, 1.0f),   // Purple
+        new Vector3f(1.0f, 0.0f, 1.0f),   // Magenta
+    };
+
+    private static Vector3f getRainbowColor() {
+        // Cycle through rainbow colors - changes every 1.5 seconds
+        int index = (int) ((System.currentTimeMillis() / 1500) % RAINBOW_COLORS.length);
+        return RAINBOW_COLORS[index];
+    }
+
+    private static Vector3f hsvToRgb(float h, float s, float v) {
+        float c = v * s;
+        float x = c * (1 - Math.abs((h * 6) % 2 - 1));
+        float m = v - c;
+
+        float r, g, b;
+        if (h < 1f/6f) {
+            r = c; g = x; b = 0;
+        } else if (h < 2f/6f) {
+            r = x; g = c; b = 0;
+        } else if (h < 3f/6f) {
+            r = 0; g = c; b = x;
+        } else if (h < 4f/6f) {
+            r = 0; g = x; b = c;
+        } else if (h < 5f/6f) {
+            r = x; g = 0; b = c;
+        } else {
+            r = c; g = 0; b = x;
+        }
+
+        return new Vector3f(r + m, g + m, b + m);
     }
 
     public static Vector3f parseHexColor(String hex) {
@@ -160,6 +219,7 @@ public class BarrierViewManager {
         enabledPlayers.remove(playerUuid);
         playerDisplayModes.remove(playerUuid);
         playerColors.remove(playerUuid);
+        rainbowPlayers.remove(playerUuid);
     }
 
     public static void start() {
@@ -188,6 +248,7 @@ public class BarrierViewManager {
         enabledPlayers.clear();
         playerDisplayModes.clear();
         playerColors.clear();
+        rainbowPlayers.clear();
     }
 
     private static void updateBarrierIndicators() {

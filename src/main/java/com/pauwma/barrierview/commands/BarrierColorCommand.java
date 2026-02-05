@@ -40,8 +40,22 @@ public class BarrierColorCommand extends AbstractPlayerCommand {
 
         if (!context.provided(this.colorArg)) {
             // Show current color and available presets
-            Vector3f currentColor = BarrierViewManager.getColor(playerUuid);
-            String hexColor = BarrierViewManager.colorToHex(currentColor);
+            boolean isRainbow = BarrierViewManager.isRainbowMode(playerUuid);
+            String currentDisplay;
+            Color displayColor;
+
+            if (isRainbow) {
+                currentDisplay = "rainbow";
+                displayColor = Color.MAGENTA;
+            } else {
+                Vector3f currentColor = BarrierViewManager.getColor(playerUuid);
+                currentDisplay = BarrierViewManager.colorToHex(currentColor);
+                displayColor = new Color(
+                        Math.round(currentColor.x * 255),
+                        Math.round(currentColor.y * 255),
+                        Math.round(currentColor.z * 255)
+                );
+            }
 
             String presets = Arrays.stream(BarrierViewManager.ColorPreset.values())
                     .map(p -> p.name().toLowerCase())
@@ -50,25 +64,32 @@ public class BarrierColorCommand extends AbstractPlayerCommand {
             context.sendMessage(Message.join(
                     Message.raw("[BarrierView] ").color(Color.RED).bold(true),
                     Message.raw("Current color: ").color(Color.WHITE),
-                    Message.raw(hexColor).color(new Color(
-                            Math.round(currentColor.x * 255),
-                            Math.round(currentColor.y * 255),
-                            Math.round(currentColor.z * 255)
-                    ))
+                    Message.raw(currentDisplay).color(displayColor)
             ));
             context.sendMessage(Message.join(
                     Message.raw("[BarrierView] ").color(Color.RED).bold(true),
-                    Message.raw("Usage: /barriercolor <preset|#hex>").color(Color.GRAY)
+                    Message.raw("Usage: /barriercolor <preset|#hex|rainbow>").color(Color.GRAY)
             ));
             context.sendMessage(Message.join(
                     Message.raw("[BarrierView] ").color(Color.RED).bold(true),
                     Message.raw("Presets: ").color(Color.WHITE),
-                    Message.raw(presets).color(Color.YELLOW)
+                    Message.raw(presets + ", rainbow").color(Color.YELLOW)
             ));
             return;
         }
 
         String colorInput = ((String) context.get(this.colorArg)).toUpperCase();
+
+        // Check for rainbow mode
+        if ("RAINBOW".equals(colorInput)) {
+            BarrierViewManager.setRainbowMode(playerUuid, true);
+            context.sendMessage(Message.join(
+                    Message.raw("[BarrierView] ").color(Color.RED).bold(true),
+                    Message.raw("Color set to: ").color(Color.WHITE),
+                    Message.raw("rainbow").color(Color.MAGENTA)
+            ));
+            return;
+        }
 
         // Try to parse as preset
         for (BarrierViewManager.ColorPreset preset : BarrierViewManager.ColorPreset.values()) {
